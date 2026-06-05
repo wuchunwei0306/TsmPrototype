@@ -242,14 +242,14 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 // DOC REGISTRY  — 维护时只需修改这里的路径
 // ══════════════════════════════════════════════
 const DOC_REGISTRY = {
-  'league':             { title: '联赛管理',   file: 'docs/联赛管理/联赛管理.md' },
-  'trading-list':       { title: '操盘列表',   file: 'docs/操盘管理/操盘列表.md' },
-  'trading-detail':     { title: '操盘详情',   file: 'docs/操盘管理/操盘详情.md' },
-  'risk-config':        { title: '风控配置',   file: 'docs/风控管理/风控配置.md' },
-  'risk-log':           { title: '风控日志',   file: 'docs/风控管理/风控日志.md' },
-  'settlement-list':    { title: '结算列表',   file: 'docs/结算管理/结算列表.md' },
-  'settlement-detail':  { title: '结算详情',   file: 'docs/结算管理/结算详情.md' },
-  'settlement-report':  { title: '结算报表',   file: 'docs/结算管理/结算报表.md' },
+  'league':             { title: '联赛管理',   file: 'docs/聯賽管理/联赛管理.md' },
+  'trading-list':       { title: '操盘列表',   file: 'docs/操盤管理/操盘列表.md' },
+  'trading-detail':     { title: '操盘详情',   file: 'docs/操盤管理/操盘详情.md' },
+  'risk-config':        { title: '风控配置',   file: 'docs/風控管理/风控配置.md' },
+  'risk-log':           { title: '风控日志',   file: 'docs/風控管理/风控日志.md' },
+  'settlement-list':    { title: '结算列表',   file: 'docs/結算管理/结算列表.md' },
+  'settlement-detail':  { title: '结算详情',   file: 'docs/結算管理/结算详情.md' },
+  'settlement-report':  { title: '结算报表',   file: 'docs/結算管理/结算报表.md' },
 };
 
 // ══════════════════════════════════════════════
@@ -261,8 +261,20 @@ let previewOn   = true;
 let searchTimer = null;
 let selIdx      = -1;
 
-// marked config
-marked.setOptions({ breaks: true, gfm: true });
+// marked config — custom renderer injects id on every heading
+const renderer = new marked.Renderer();
+renderer.heading = function(token) {
+  const text = typeof token === 'object' ? (token.text || '') : (String(token) || '');
+  const level = typeof token === 'object' ? (token.depth || 2) : (arguments[1] || 2);
+  const slug = text
+    .replace(/<[^>]+>/g, '')
+    .replace(/[^\u4e00-\u9fa5\w\s\-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .toLowerCase() || ('h' + level + '-' + Math.random().toString(36).slice(2,6));
+  return '<h' + level + ' id="' + slug + '">' + text + '</h' + level + '>\n';
+};
+marked.setOptions({ breaks: true, gfm: true, renderer: renderer });
 
 // ══════════════════════════════════════════════
 // SWITCH DOC
@@ -339,15 +351,21 @@ function renderDoc(key, anchorId) {
 // HEADINGS extraction
 // ══════════════════════════════════════════════
 function extractHeadings(html) {
-  const re = /<h([23])[^>]*id="([^"]*)"[^>]*>(.*?)<\/h\1>/g;
+  // Match h2/h3 with or without id attribute
+  const re = /<h([23])([^>]*)>(.*?)<\/h\1>/g;
   const result = [];
   let m;
   while ((m = re.exec(html)) !== null) {
-    result.push({
-      level: m[1],
-      id: m[2],
-      text: m[3].replace(/<[^>]+>/g, '')
-    });
+    const attrs = m[2];
+    const text = m[3].replace(/<[^>]+>/g, '');
+    // Extract id if present, otherwise generate from text
+    const idMatch = attrs.match(/id="([^"]*)"/);
+    const id = idMatch ? idMatch[1] : text
+      .replace(/[^\u4e00-\u9fa5\w\s\-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .toLowerCase() || ('h' + m[1] + '-' + Math.random().toString(36).slice(2,6));
+    result.push({ level: m[1], id, text });
   }
   return result;
 }
