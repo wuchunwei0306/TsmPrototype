@@ -1,575 +1,651 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio — UI/UX Designer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&family=Space+Mono&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TMS PRD · 产品需求文档</title>
+<!-- marked.js for MD→HTML rendering -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<style>
+:root {
+  --bg:      #0d1117;
+  --bg2:     #161b22;
+  --bg3:     #1c2128;
+  --border:  #30363d;
+  --text:    #e6edf3;
+  --text2:   #8b949e;
+  --text3:   #6e7681;
+  --blue:    #58a6ff;
+  --green:   #3fb950;
+  --orange:  #d29922;
+  --red:     #f85149;
+  --purple:  #a371f7;
+  --sidebar: 240px;
+  --topbar:  100px;
+  --preview: 340px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.7}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-    :root {
-      --bg: #0d0d0d;
-      --surface: #161616;
-      --border: #2a2a2a;
-      --accent: #c8ff00;
-      --accent2: #ff6b35;
-      --text: #e8e8e0;
-      --muted: #666;
-      --tag-bg: #1e1e1e;
-    }
+/* ── TOP BAR ── */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar);background:var(--bg2);border-bottom:1px solid var(--border);z-index:300;display:flex;flex-direction:column}
+.topbar-row1{display:flex;align-items:center;padding:0 16px;gap:12px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.brand-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#58a6ff,#3fb950);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.brand-name{font-size:14px;font-weight:700;color:var(--text)}
+.brand-sub{font-size:11px;color:var(--text3);margin-left:4px}
+.divider{width:1px;height:28px;background:var(--border);flex-shrink:0}
 
-    html { scroll-behavior: smooth; }
+/* Search */
+.search-wrap{flex:1;max-width:480px;position:relative}
+.search-input{width:100%;padding:7px 32px 7px 34px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;outline:none;transition:border-color .15s}
+.search-input::placeholder{color:var(--text3)}
+.search-input:focus{border-color:var(--blue)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);pointer-events:none}
+.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px;display:none}
+.search-clear.show{display:block}
+.search-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);max-height:420px;overflow-y:auto;z-index:999;display:none}
+.search-dropdown.show{display:block}
+.sri{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s}
+.sri:last-child{border-bottom:none}
+.sri:hover,.sri.sel{background:var(--bg3)}
+.sri-tag{display:inline-block;background:rgba(88,166,255,.12);border:1px solid rgba(88,166,255,.25);color:var(--blue);padding:1px 6px;border-radius:3px;font-size:10px;margin-bottom:3px}
+.sri-title{font-size:13px;color:var(--text);font-weight:500;margin-bottom:3px}
+.sri-snippet{font-size:12px;color:var(--text3);line-height:1.5}
+.sri-snippet mark,.sri-title mark{background:rgba(88,166,255,.25);color:var(--blue);border-radius:2px;padding:0 2px}
+.search-empty{padding:28px;text-align:center;color:var(--text3);font-size:13px}
+.search-loading{padding:20px;text-align:center;color:var(--text3);font-size:12px}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
+/* Actions */
+.topbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.btn-proto{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.3);color:var(--blue);font-size:12px;font-weight:500;text-decoration:none;transition:all .15s;white-space:nowrap}
+.btn-proto:hover{background:rgba(88,166,255,.2);border-color:var(--blue)}
+.btn-preview{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s}
+.btn-preview:hover{border-color:var(--purple);color:var(--text)}
+.btn-preview.on{background:rgba(163,113,247,.1);border-color:rgba(163,113,247,.35);color:var(--purple)}
 
-    /* ── Noise overlay ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.35;
-    }
+/* Row 2 tabs */
+.topbar-row2{display:flex;align-items:stretch;padding:0 12px;height:48px;flex-shrink:0;overflow-x:auto;gap:0}
+.topbar-row2::-webkit-scrollbar{height:0}
+.tab-group{display:flex;align-items:center;padding:0 4px;border-right:1px solid var(--border);gap:2px}
+.tab-group:last-child{border-right:none}
+.tab-group-label{font-size:10px;font-weight:600;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;padding:0 6px;white-space:nowrap;flex-shrink:0}
+.mod-tab{padding:5px 12px;border:none;border-radius:5px;background:transparent;color:var(--text2);font-size:12px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.mod-tab:hover{background:var(--bg3);color:var(--text)}
+.mod-tab.active{background:rgba(88,166,255,.15);color:var(--blue);font-weight:500}
 
-    /* ── Nav ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.25rem 3rem;
-      border-bottom: 1px solid var(--border);
-      background: rgba(13,13,13,0.85);
-      backdrop-filter: blur(12px);
-    }
+/* ── LAYOUT ── */
+.layout{display:flex;height:calc(100vh - var(--topbar));margin-top:var(--topbar)}
 
-    .nav-logo {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      text-transform: uppercase;
-    }
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-hd{padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;flex-shrink:0}
+.sidebar-body{flex:1;overflow-y:auto;padding:6px 0}
+.ch{border-bottom:1px solid rgba(48,54,61,.5)}
+.ch-hd{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;user-select:none;font-size:12px;font-weight:600;color:var(--text2);transition:all .15s}
+.ch-hd:hover{background:var(--bg3);color:var(--text)}
+.ch-caret{font-size:9px;transition:transform .2s;color:var(--text3)}
+.ch.collapsed .ch-caret{transform:rotate(-90deg)}
+.ch.collapsed .ch-items{display:none}
+.nav-a{display:block;padding:5px 14px 5px 20px;font-size:12px;color:var(--text3);cursor:pointer;transition:all .12s;border-left:2px solid transparent;margin-left:2px}
+.nav-a:hover{color:var(--text2);background:rgba(255,255,255,.02)}
+.nav-a.active{color:var(--blue);border-left-color:var(--blue);background:rgba(88,166,255,.05)}
+.nav-a.h3{padding-left:30px;font-size:11px}
 
-    .nav-links { display: flex; gap: 2rem; }
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.82rem;
-      letter-spacing: 0.04em;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
+/* ── CONTENT ── */
+.content{flex:1;min-width:0;overflow-y:auto;padding:32px 44px 80px}
 
-    /* ── Hero ── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 3rem 5rem;
-      position: relative;
-      overflow: hidden;
-    }
+/* ── Markdown ── */
+.md h1{font-size:22px;font-weight:700;padding-bottom:12px;margin-bottom:6px;border-bottom:1px solid var(--border);color:var(--text)}
+.md h2{font-size:16px;font-weight:600;margin:32px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);color:var(--text);scroll-margin-top:24px}
+.md h3{font-size:14px;font-weight:600;margin:20px 0 8px;color:var(--text2);scroll-margin-top:24px}
+.md p{margin-bottom:12px;color:var(--text2);line-height:1.8}
+.md ul,.md ol{margin:6px 0 12px 20px;color:var(--text2)}
+.md li{margin-bottom:4px;line-height:1.75}
+.md strong{color:var(--text);font-weight:600}
+.md code{background:var(--bg3);border:1px solid var(--border);padding:2px 6px;border-radius:4px;font-size:12px;font-family:ui-monospace,Menlo,monospace;color:var(--blue)}
+.md pre{background:var(--bg3);border:1px solid var(--border);padding:14px 16px;border-radius:8px;overflow-x:auto;margin:12px 0}
+.md pre code{background:none;border:none;padding:0;color:var(--text2);font-size:12px;line-height:1.6}
+.md table{width:100%;border-collapse:collapse;margin:12px 0 20px;font-size:13px}
+.md th{background:var(--bg3);padding:9px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap}
+.md td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+.md tr:hover td{background:rgba(255,255,255,.015)}
+.md blockquote{border-left:3px solid var(--orange);padding:10px 16px;background:rgba(210,153,34,.06);border-radius:0 6px 6px 0;margin:12px 0;color:var(--text2);font-size:13px}
+.md hr{border:none;border-top:1px solid var(--border);margin:24px 0}
+.md a{color:var(--blue);text-decoration:none}
+.md a:hover{text-decoration:underline}
 
-    .hero-bg-text {
-      position: absolute;
-      top: 50%;
-      left: -2%;
-      transform: translateY(-50%);
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(8rem, 18vw, 22rem);
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(200,255,0,0.06);
-      line-height: 1;
-      white-space: nowrap;
-      pointer-events: none;
-      user-select: none;
-      animation: drift 20s ease-in-out infinite alternate;
-    }
+/* screenshot button */
+.ss-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:4px;cursor:pointer;background:rgba(163,113,247,.1);border:1px solid rgba(163,113,247,.3);color:var(--purple);font-size:11px;font-weight:500;transition:all .15s;vertical-align:middle;margin-left:6px}
+.ss-btn:hover{background:rgba(163,113,247,.2);border-color:var(--purple)}
 
-    @keyframes drift {
-      from { transform: translateY(-50%) translateX(0); }
-      to   { transform: translateY(-50%) translateX(2%); }
-    }
+/* loading / error states */
+.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;height:55vh;gap:14px;color:var(--text3)}
+.state-ico{font-size:44px;opacity:.25}
+.state-spin{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-    .hero-tag {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--accent);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.2s forwards;
-    }
-
-    .hero h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(3.5rem, 8vw, 7.5rem);
-      line-height: 1.05;
-      font-weight: 400;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.35s forwards;
-    }
-
-    .hero h1 em {
-      font-style: italic;
-      color: var(--accent);
-    }
-
-    .hero-desc {
-      max-width: 520px;
-      margin-top: 2rem;
-      font-size: 1rem;
-      color: var(--muted);
-      line-height: 1.75;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.5s forwards;
-    }
-
-    .hero-scroll {
-      margin-top: 4rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.7s forwards;
-    }
-
-    .hero-scroll span {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .scroll-line {
-      width: 60px;
-      height: 1px;
-      background: var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-    .scroll-line::after {
-      content: '';
-      position: absolute;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: var(--accent);
-      animation: slide 2s 1s infinite;
-    }
-    @keyframes slide { to { left: 100%; } }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Section ── */
-    section {
-      padding: 7rem 3rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: baseline;
-      gap: 1.5rem;
-      margin-bottom: 4rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1.5rem;
-    }
-
-    .section-num {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--accent);
-      letter-spacing: 0.12em;
-    }
-
-    .section-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 400;
-    }
-
-    /* ── Cards grid ── */
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 1.5px;
-      border: 1px solid var(--border);
-    }
-
-    .card {
-      background: var(--surface);
-      padding: 2.5rem;
-      position: relative;
-      overflow: hidden;
-      transition: background 0.3s;
-      border: 1px solid transparent;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(200,255,0,0.04) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.4s;
-    }
-
-    .card:hover { background: #1a1a1a; }
-    .card:hover::before { opacity: 1; }
-
-    .card-badge {
-      display: inline-block;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 0.3rem 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      color: var(--muted);
-      margin-bottom: 1.75rem;
-    }
-
-    .card-badge.ai { border-color: rgba(200,255,0,0.3); color: var(--accent); }
-    .card-badge.client { border-color: rgba(255,107,53,0.3); color: var(--accent2); }
-
-    .card h3 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.6rem;
-      font-weight: 400;
-      margin-bottom: 0.75rem;
-      line-height: 1.2;
-    }
-
-    .card p {
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.75;
-      margin-bottom: 2rem;
-    }
-
-    .card-links { display: flex; flex-direction: column; gap: 0.6rem; }
-
-    .link-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      text-decoration: none;
-      color: var(--text);
-      font-size: 0.82rem;
-      padding: 0.65rem 0.9rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      transition: border-color 0.2s, color 0.2s, background 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .link-row:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(200,255,0,0.04);
-    }
-
-    .link-row .link-icon {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-      opacity: 0.5;
-    }
-
-    .link-row:hover .link-icon { opacity: 1; }
-
-    .link-note {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.62rem;
-      color: var(--muted);
-      margin-left: auto;
-      white-space: nowrap;
-    }
-
-    /* ── About strip ── */
-    .about-strip {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 5rem 3rem;
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 4rem;
-      align-items: start;
-      max-width: 100%;
-    }
-
-    .about-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      color: var(--accent);
-      text-transform: uppercase;
-      padding-top: 0.25rem;
-    }
-
-    .about-text {
-      font-size: 1.05rem;
-      line-height: 1.9;
-      color: #aaa;
-    }
-
-    .about-text strong { color: var(--text); font-weight: 500; }
-
-    /* ── Skills bar ── */
-    .skills-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-top: 2rem;
-    }
-
-    .skill-tag {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.08em;
-      padding: 0.4rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    /* ── Footer ── */
-    footer {
-      padding: 3rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    footer p {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem;
-      color: var(--muted);
-      letter-spacing: 0.06em;
-    }
-
-    .footer-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.7); }
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 768px) {
-      nav { padding: 1rem 1.5rem; }
-      .nav-links { display: none; }
-      .hero { padding: 0 1.5rem 4rem; }
-      section { padding: 5rem 1.5rem; }
-      .about-strip { grid-template-columns: 1fr; gap: 1.5rem; padding: 3rem 1.5rem; }
-      .cards-grid { grid-template-columns: 1fr; }
-      footer { padding: 2rem 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
-    }
-  </style>
+/* ── PREVIEW ── */
+.preview{width:var(--preview);flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .25s ease,opacity .25s}
+.preview.hidden{width:0;opacity:0;pointer-events:none}
+.preview-hd{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.preview-hd-title{font-size:11px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:6px}
+.preview-dot{width:7px;height:7px;border-radius:50%;background:var(--purple)}
+.preview-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:2px 5px;border-radius:3px;transition:all .12s}
+.preview-close:hover{background:var(--bg3);color:var(--text)}
+.preview-body{flex:1;overflow-y:auto;padding:12px}
+.preview-tip{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:7px;padding:14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.7}
+.preview-tip h4{color:var(--blue);font-size:12px;margin-bottom:8px}
+.preview-tip code{font-size:11px;background:var(--bg3);padding:2px 5px;border-radius:3px;color:var(--purple)}
+.preview-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;color:var(--text3);font-size:12px;text-align:center;gap:10px;padding:24px 16px}
+.preview-placeholder-ico{font-size:36px;opacity:.35}
+.preview-img-card{border-radius:7px;overflow:hidden;border:1px solid var(--border);background:var(--bg3);margin-bottom:10px}
+.preview-img-card img{width:100%;display:block}
+.preview-img-lbl{padding:7px 10px;font-size:11px;color:var(--text3);border-top:1px solid var(--border)}
+.preview-missing{background:var(--bg3);border:1px dashed var(--border);border-radius:6px;padding:20px;text-align:center;color:var(--text3);font-size:12px}
+.preview-missing code{display:block;margin-top:6px;color:var(--purple);font-size:11px}
+</style>
 </head>
 <body>
 
-  <!-- Nav -->
-  <nav>
-    <div class="nav-logo">Portfolio · 2026</div>
-    <div class="nav-links">
-      <a href="#works">作品</a>
-      <a href="#about">關於</a>
+<header class="topbar">
+  <div class="topbar-row1">
+    <div class="brand">
+      <div class="brand-icon">T</div>
+      <span class="brand-name">TMS</span>
+      <span class="brand-sub">产品需求文档</span>
     </div>
-  </nav>
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-bg-text">DESIGN</div>
-    <div class="hero-tag">✦ UI/UX Designer &amp; Product Thinker</div>
-    <h1>Building<br /><em>thoughtful</em><br />interfaces.</h1>
-    <p class="hero-desc">
-      專注於博彩娛樂、體育直播與企業後台系統的 UI/UX 設計，
-      擅長從流程架構到視覺呈現的全端設計思維，
-      致力打造兼具商業價值與使用者體驗的數位產品。
-    </p>
-    <div class="hero-scroll">
-      <div class="scroll-line"></div>
-      <span>Scroll to explore</span>
+    <div class="divider"></div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="searchInput" type="text"
+        placeholder="搜索文档内容… (支持模糊搜索)"
+        oninput="onSearch(this.value)"
+        onkeydown="onSearchKey(event)"
+        autocomplete="off">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+      <div class="search-dropdown" id="searchDropdown"></div>
     </div>
-  </div>
-
-  <!-- Works -->
-  <section id="works" style="max-width:100%;padding-left:3rem;padding-right:3rem;">
-    <div class="section-header">
-      <span class="section-num">01 /</span>
-      <h2 class="section-title">Selected Works</h2>
-    </div>
-
-    <div class="cards-grid">
-
-      <!-- MBML -->
-      <div class="card" onmousemove="moveGlow(event,this)">
-        <span class="card-badge ai">AI 輔助設計 · Demo</span>
-        <h3>MBML<br />體育操盤系統</h3>
-        <p>
-          離職後以 AI 工具自主製作的體育博彩操盤平台原型，
-          涵蓋 TMS 盤口管理介面與交易明細流程，
-          著重高密度資訊呈現與即時操盤效率的設計平衡。
-        </p>
-        <div class="card-links">
-          <a class="link-row" href="https://prototype20260603.netlify.app/league-management" target="_blank" rel="noopener">
-            <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            TMS 操盤後台PRD
-          </a>
-          <a class="link-row" href="https://prototype20260603.netlify.app/trading-detail" target="_blank" rel="noopener">
-            <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            Trading Detail 原型
-          </a>
-        </div>
-      </div>
-
-      <!-- BBgames AI -->
-      <div class="card" onmousemove="moveGlow(event,this)">
-        <span class="card-badge ai">AI 輔助設計 · Demo</span>
-        <h3>BBgames<br />後台管理系統</h3>
-        <p>
-          電競娛樂平台後台的互動原型，展示內容管理系統（CMS）的視覺設計邏輯，
-          包含資料表格、狀態管控與操作流程等核心後台功能設計。
-          帳號/密碼:admin/Qwe1234
-        </p>
-        <div class="card-links">
-          <a class="link-row" href="https://htmlpreview.github.io/?https://github.com/wuchunwei0306/Content-Management-System/blob/main/demo_admin_v7.html" target="_blank" rel="noopener">
-            <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            CMS Admin Demo
-            <span class="link-note">GitHub Preview</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- BBgames 後台 Axure -->
-      <div class="card" onmousemove="moveGlow(event,this)">
-        <span class="card-badge client">後台 · Axure 原型</span>
-        <h3>BBgames<br />後台原型規格</h3>
-        <p>
-          以 Axure 製作的高保真後台原型，包含完整的互動邏輯與流程標注，
-          可供開發團隊直接對接的設計交付規格文件，涵蓋兩套不同模組場景。
-        </p>
-        <div class="card-links">
-          <a class="link-row" href="https://u8hnd5.axshare.com" target="_blank" rel="noopener">
-            <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            後台原型 A
-          </a>
-          <a class="link-row" href="https://qqwcap.axshare.com" target="_blank" rel="noopener">
-            <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            後台原型 B
-          </a>
-        </div>
-      </div>
-
-      <!-- Figma 綜合客戶端 -->
-      <div class="card" onmousemove="moveGlow(event,this)">
-        <span class="card-badge client">客戶端 · Figma 原型</span>
-        <h3>多平台<br />客戶端設計整合</h3>
-        <p>
-          整合多家公司客戶端需求的 Figma 設計原型，
-          涵蓋跨平台 UI 規範、元件系統建立與使用者旅程設計，
-          是系統性整合複雜需求的設計實踐案例。
-        </p>
-        <div class="card-links">
-          <a class="link-row" href="https://www.figma.com/design/FxJNckuaPCeIx3UJbIgEEb/Prototype?node-id=0-1&p=f" target="_blank" rel="noopener">
-            <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            開啟 Figma 原型
-          </a>
-        </div>
-      </div>
-
-      <!-- Bsport -->
-      <div class="card" onmousemove="moveGlow(event,this)">
-        <span class="card-badge client">客戶端 · Axure 原型</span>
-        <h3>Bsport<br />運動平台客戶端</h3>
-        <p>
-          運動資訊平台的客戶端 Axure 原型，聚焦於賽事資訊瀏覽、
-          即時數據呈現與投注體驗流程，兼顧資訊架構的清晰度與操作直覺性。
-        </p>
-        <div class="card-links">
-          <a class="link-row" href="https://ksyx1w.axshare.com" target="_blank" rel="noopener">
-            <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            開啟 Axure 原型
-            <span class="link-note">密碼：19890604</span>
-          </a>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- About -->
-  <div class="about-strip" id="about">
-    <div class="about-label">About</div>
-    <div>
-      <p class="about-text">
-        擁有 <strong>7+ 年互動娛樂產品經驗</strong>，深耕體育直播、即時通訊、彩票與支付金流等垂直領域，
-        產品曾成功落地於<strong>中國、巴西及東南亞</strong>多個市場。
-        熟悉 B 端系統架構與 C 端體驗設計的雙向視角，擅長跨部門敏捷協作，
-        並具備以 <strong>AI 工具</strong>輔助需求分析與效能提升的實戰經驗。
-      </p>
-      <div class="skills-row">
-        <span class="skill-tag">Figma</span>
-        <span class="skill-tag">Axure RP</span>
-        <span class="skill-tag">UI Design</span>
-        <span class="skill-tag">UX Research</span>
-        <span class="skill-tag">Prototyping</span>
-        <span class="skill-tag">Design System</span>
-        <span class="skill-tag">iGaming</span>
-        <span class="skill-tag">Sports Betting</span>
-        <span class="skill-tag">AI-Assisted Design</span>
-      </div>
+    <div class="topbar-actions">
+      <a class="btn-proto" href="https://prototype20260603.netlify.app/trading-detail" target="_blank">🔗 查看原型</a>
+      <button class="btn-preview on" id="previewBtn" onclick="togglePreview()">🖼 截图面板</button>
     </div>
   </div>
+  <div class="topbar-row2">
+    <div class="tab-group">
+      <span class="tab-group-label">联赛管理</span>
+      <button class="mod-tab" data-doc="league" onclick="switchDoc('league')">联赛管理</button>
+    </div>
+    <div class="tab-group">
+      <span class="tab-group-label">操盘管理</span>
+      <button class="mod-tab" data-doc="trading-list" onclick="switchDoc('trading-list')">操盘列表</button>
+      <button class="mod-tab" data-doc="trading-detail" onclick="switchDoc('trading-detail')">操盘详情</button>
+    </div>
+    <div class="tab-group">
+      <span class="tab-group-label">风控管理</span>
+      <button class="mod-tab" data-doc="risk-config" onclick="switchDoc('risk-config')">风控配置</button>
+      <button class="mod-tab" data-doc="risk-log" onclick="switchDoc('risk-log')">风控日志</button>
+    </div>
+    <div class="tab-group">
+      <span class="tab-group-label">结算管理</span>
+      <button class="mod-tab" data-doc="settlement-list" onclick="switchDoc('settlement-list')">结算列表</button>
+      <button class="mod-tab" data-doc="settlement-detail" onclick="switchDoc('settlement-detail')">结算详情</button>
+      <button class="mod-tab" data-doc="settlement-report" onclick="switchDoc('settlement-report')">结算报表</button>
+    </div>
+  </div>
+</header>
 
-  <!-- Footer -->
-  <footer>
-    <p>© 2026 — UI/UX Designer Portfolio</p>
-    <div class="footer-dot"></div>
-    <p>Built with intention.</p>
-  </footer>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-hd" id="sidebarHd">目录</div>
+    <div class="sidebar-body" id="sidebarBody">
+      <div style="padding:40px 16px;text-align:center;color:var(--text3);font-size:12px">从顶部选择模块</div>
+    </div>
+  </aside>
 
-  <script>
-    function moveGlow(e, card) {
-      const rect = card.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      card.style.setProperty('--mx', x + '%');
-      card.style.setProperty('--my', y + '%');
+  <main class="content" id="content">
+    <div class="md" id="mdBody">
+      <div class="state-box">
+        <div class="state-ico">📋</div>
+        <div style="font-size:14px">从顶部导航选择模块开始阅读</div>
+        <div style="font-size:12px;opacity:.7">或使用搜索框快速定位内容</div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="preview" id="previewPanel">
+    <div class="preview-hd">
+      <div class="preview-hd-title"><span class="preview-dot"></span>截图预览</div>
+      <button class="preview-close" onclick="clearPreview()" title="清空">✕</button>
+    </div>
+    <div class="preview-body" id="previewBody">
+      <div class="preview-tip">
+        <h4>📌 如何添加截图按钮</h4>
+        在 <code>.md</code> 文档中写：<br><br>
+        <code>[查看截图](screenshots/文件名.png)</code><br><br>
+        系统自动转为紫色按钮，点击后截图显示在此处。截图文件放仓库 <code>screenshots/</code> 目录下。
+      </div>
+      <div class="preview-placeholder">
+        <div class="preview-placeholder-ico">🖼</div>
+        <div>点击文档中的<br><strong style="color:var(--purple)">「查看截图」</strong>按钮<br>在此处展示对应截图</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// DOC REGISTRY  — 维护时只需修改这里的路径
+// ══════════════════════════════════════════════
+const DOC_REGISTRY = {
+  'league':             { title: '联赛管理',   file: 'docs/联赛管理/联赛管理.md' },
+  'trading-list':       { title: '操盘列表',   file: 'docs/操盘管理/操盘列表.md' },
+  'trading-detail':     { title: '操盘详情',   file: 'docs/操盘管理/操盘详情.md' },
+  'risk-config':        { title: '风控配置',   file: 'docs/风控管理/风控配置.md' },
+  'risk-log':           { title: '风控日志',   file: 'docs/风控管理/风控日志.md' },
+  'settlement-list':    { title: '结算列表',   file: 'docs/结算管理/结算列表.md' },
+  'settlement-detail':  { title: '结算详情',   file: 'docs/结算管理/结算详情.md' },
+  'settlement-report':  { title: '结算报表',   file: 'docs/结算管理/结算报表.md' },
+};
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const cache = {};          // key → { html, plainText, headings }
+let currentDoc  = null;
+let previewOn   = true;
+let searchTimer = null;
+let selIdx      = -1;
+
+// marked config — custom renderer injects id on every heading
+const renderer = new marked.Renderer();
+renderer.heading = function(token) {
+  const text = typeof token === 'object' ? (token.text || '') : (String(token) || '');
+  const level = typeof token === 'object' ? (token.depth || 2) : (arguments[1] || 2);
+  const slug = text
+    .replace(/<[^>]+>/g, '')
+    .replace(/[^\u4e00-\u9fa5\w\s\-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .toLowerCase() || ('h' + level + '-' + Math.random().toString(36).slice(2,6));
+  return '<h' + level + ' id="' + slug + '">' + text + '</h' + level + '>\n';
+};
+marked.setOptions({ breaks: true, gfm: true, renderer: renderer });
+
+// ══════════════════════════════════════════════
+// SWITCH DOC
+// ══════════════════════════════════════════════
+async function switchDoc(key, anchorId) {
+  currentDoc = key;
+  document.querySelectorAll('.mod-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.doc === key)
+  );
+
+  if (cache[key]) {
+    renderDoc(key, anchorId);
+    return;
+  }
+
+  // Show loading
+  document.getElementById('mdBody').innerHTML =
+    '<div class="state-box"><div class="state-spin"></div><div style="font-size:12px;margin-top:8px">加载中…</div></div>';
+  document.getElementById('sidebarBody').innerHTML =
+    '<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">加载中…</div>';
+
+  const reg = DOC_REGISTRY[key];
+  if (!reg) {
+    showError(key, '未找到文档配置');
+    return;
+  }
+
+  try {
+    const res = await fetch(reg.file);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const md = await res.text();
+    const html = marked.parse(md);
+    const headings = extractHeadings(html);
+    const plain = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    cache[key] = { html, headings, plain };
+    renderDoc(key, anchorId);
+  } catch(e) {
+    showError(key, e.message);
+  }
+}
+
+function showError(key, msg) {
+  const reg = DOC_REGISTRY[key] || {};
+  document.getElementById('mdBody').innerHTML = `
+    <div class="state-box">
+      <div class="state-ico">⚠️</div>
+      <div style="font-size:14px;color:var(--red)">文档加载失败</div>
+      <div style="font-size:12px">${reg.file || key}</div>
+      <div style="font-size:11px;color:var(--text3)">${msg}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.8;text-align:center">
+        请确认文件已放入 <code style="color:var(--purple)">docs/</code> 目录<br>
+        本地直接打开 HTML 文件会因浏览器安全策略无法读取 .md<br>
+        建议使用 GitHub Pages 或本地 HTTP 服务器访问
+      </div>
+    </div>`;
+  document.getElementById('sidebarBody').innerHTML = '';
+}
+
+function renderDoc(key, anchorId) {
+  const d = cache[key];
+  document.getElementById('mdBody').className = 'md';
+  document.getElementById('mdBody').innerHTML = d.html;
+  injectSsBtns();
+  buildSidebar(key);
+  clearPreviewBody();
+  if (anchorId) {
+    setTimeout(() => scrollToId(anchorId), 60);
+  } else {
+    document.getElementById('content').scrollTo(0, 0);
+  }
+}
+
+// ══════════════════════════════════════════════
+// HEADINGS extraction
+// ══════════════════════════════════════════════
+function extractHeadings(html) {
+  // Match h2/h3 with or without id attribute
+  const re = /<h([23])([^>]*)>(.*?)<\/h\1>/g;
+  const result = [];
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    const attrs = m[2];
+    const text = m[3].replace(/<[^>]+>/g, '');
+    // Extract id if present, otherwise generate from text
+    const idMatch = attrs.match(/id="([^"]*)"/);
+    const id = idMatch ? idMatch[1] : text
+      .replace(/[^\u4e00-\u9fa5\w\s\-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .toLowerCase() || ('h' + m[1] + '-' + Math.random().toString(36).slice(2,6));
+    result.push({ level: m[1], id, text });
+  }
+  return result;
+}
+
+// ══════════════════════════════════════════════
+// SIDEBAR
+// ══════════════════════════════════════════════
+function buildSidebar(key) {
+  const d = cache[key];
+  const reg = DOC_REGISTRY[key];
+  document.getElementById('sidebarHd').textContent = (reg ? reg.title : key) + ' · 目录';
+  const body = document.getElementById('sidebarBody');
+  body.innerHTML = '';
+
+  let chapter = null, items = null;
+  d.headings.forEach(h => {
+    if (h.level === '2') {
+      chapter = document.createElement('div');
+      chapter.className = 'ch';
+      const hd = document.createElement('div');
+      hd.className = 'ch-hd';
+      hd.innerHTML = `<span>${h.text}</span><span class="ch-caret">▾</span>`;
+      hd.onclick = () => chapter.classList.toggle('collapsed');
+      items = document.createElement('div');
+      items.className = 'ch-items';
+      items.appendChild(makeLink(h.text, h.id, false));
+      chapter.appendChild(hd);
+      chapter.appendChild(items);
+      body.appendChild(chapter);
+    } else if (h.level === '3' && items) {
+      items.appendChild(makeLink(h.text, h.id, true));
     }
-  </script>
+  });
+}
+
+function makeLink(text, id, isH3) {
+  const a = document.createElement('a');
+  a.className = 'nav-a' + (isH3 ? ' h3' : '');
+  a.textContent = text;
+  a._id = id;
+  a.onclick = () => {
+    scrollToId(id);
+    document.querySelectorAll('.nav-a').forEach(n => n.classList.remove('active'));
+    a.classList.add('active');
+  };
+  return a;
+}
+
+function scrollToId(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  document.getElementById('content').scrollTo({ top: el.offsetTop - 20, behavior: 'smooth' });
+}
+
+// Scroll spy
+document.getElementById('content').addEventListener('scroll', function() {
+  if (!currentDoc) return;
+  const hs = document.getElementById('mdBody').querySelectorAll('h2[id],h3[id]');
+  const top = this.scrollTop + 70;
+  let cur = null;
+  hs.forEach(h => { if (h.offsetTop <= top) cur = h; });
+  if (!cur) return;
+  document.querySelectorAll('.nav-a').forEach(n =>
+    n.classList.toggle('active', n._id === cur.id)
+  );
+});
+
+// ══════════════════════════════════════════════
+// SCREENSHOT BUTTONS
+// ══════════════════════════════════════════════
+function injectSsBtns() {
+  const body = document.getElementById('mdBody');
+  body.innerHTML = body.innerHTML.replace(
+    /<a href="(screenshots\/[^"]+)"[^>]*>([^<]*)<\/a>/g,
+    (_, src, label) =>
+      `<button class="ss-btn" onclick="showPreview('${src}','${label}')">${label}</button>`
+  );
+}
+
+// ══════════════════════════════════════════════
+// PREVIEW
+// ══════════════════════════════════════════════
+function showPreview(src, label) {
+  if (!previewOn) togglePreview();
+  document.getElementById('previewBody').innerHTML = `
+    <div class="preview-img-card">
+      <img src="${src}" alt="${label}"
+        onerror="this.parentElement.outerHTML='<div class=preview-missing>截图未找到<code>${src}</code></div>'">
+      <div class="preview-img-lbl">${label}</div>
+    </div>`;
+}
+
+function clearPreview() { clearPreviewBody(); }
+
+function clearPreviewBody() {
+  document.getElementById('previewBody').innerHTML = `
+    <div class="preview-tip">
+      <h4>📌 如何添加截图按钮</h4>
+      在 <code>.md</code> 文档中写：<br><br>
+      <code>[查看截图](screenshots/文件名.png)</code><br><br>
+      系统自动转为紫色按钮，点击后截图显示在此处。截图文件放仓库 <code>screenshots/</code> 目录下。
+    </div>
+    <div class="preview-placeholder">
+      <div class="preview-placeholder-ico">🖼</div>
+      <div>点击文档中的<br><strong style="color:var(--purple)">「查看截图」</strong>按钮<br>在此处展示对应截图</div>
+    </div>`;
+}
+
+function togglePreview() {
+  previewOn = !previewOn;
+  document.getElementById('previewPanel').classList.toggle('hidden', !previewOn);
+  document.getElementById('previewBtn').classList.toggle('on', previewOn);
+}
+
+// ══════════════════════════════════════════════
+// SEARCH  (searches all cached + pre-fetches all)
+// ══════════════════════════════════════════════
+// Pre-fetch all docs in background for full search
+async function prefetchAll() {
+  for (const key of Object.keys(DOC_REGISTRY)) {
+    if (!cache[key]) {
+      try {
+        const reg = DOC_REGISTRY[key];
+        const res = await fetch(reg.file);
+        if (!res.ok) continue;
+        const md = await res.text();
+        const html = marked.parse(md);
+        const headings = extractHeadings(html);
+        const plain = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        cache[key] = { html, headings, plain };
+      } catch(e) { /* skip */ }
+    }
+  }
+}
+// Start prefetch after page load (non-blocking)
+window.addEventListener('load', () => setTimeout(prefetchAll, 800));
+
+function onSearch(val) {
+  clearTimeout(searchTimer);
+  document.getElementById('searchClear').classList.toggle('show', val.length > 0);
+  if (!val.trim()) { closeSearch(); return; }
+  searchTimer = setTimeout(() => doSearch(val.trim()), 180);
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('show');
+  closeSearch();
+}
+
+function closeSearch() {
+  const dd = document.getElementById('searchDropdown');
+  dd.classList.remove('show');
+  dd.innerHTML = '';
+  selIdx = -1;
+}
+
+function onSearchKey(e) {
+  const dd = document.getElementById('searchDropdown');
+  const items = dd.querySelectorAll('.sri');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    selIdx = Math.min(selIdx + 1, items.length - 1);
+    items.forEach((it, i) => it.classList.toggle('sel', i === selIdx));
+    if (items[selIdx]) items[selIdx].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    selIdx = Math.max(selIdx - 1, 0);
+    items.forEach((it, i) => it.classList.toggle('sel', i === selIdx));
+  } else if (e.key === 'Enter') {
+    const target = items[selIdx] || items[0];
+    if (target) target.click();
+  } else if (e.key === 'Escape') {
+    clearSearch();
+  }
+}
+
+function doSearch(q) {
+  const dd = document.getElementById('searchDropdown');
+  const cachedKeys = Object.keys(cache);
+
+  if (cachedKeys.length === 0) {
+    dd.innerHTML = '<div class="search-loading">文档加载中，请稍后搜索…</div>';
+    dd.classList.add('show');
+    return;
+  }
+
+  const qLower = q.toLowerCase();
+  // fuzzy: chars must appear in order
+  const fuzzyRe = new RegExp(
+    q.split('').map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*'), 'i'
+  );
+
+  const results = [];
+
+  cachedKeys.forEach(docKey => {
+    const d = cache[docKey];
+    const reg = DOC_REGISTRY[docKey];
+    const docTitle = reg ? reg.title : docKey;
+
+    // heading hits
+    d.headings.forEach(h => {
+      if (fuzzyRe.test(h.text)) {
+        const exact = h.text.toLowerCase().includes(qLower);
+        results.push({
+          docKey, docTitle, headingId: h.id,
+          title: h.text,
+          snippet: extractSnippet(d.plain, q),
+          score: exact ? 3 : 1
+        });
+      }
+    });
+
+    // full text hit
+    const idx = d.plain.toLowerCase().indexOf(qLower);
+    if (idx !== -1) {
+      results.push({
+        docKey, docTitle, headingId: null,
+        title: docTitle + ' · 全文',
+        snippet: extractSnippet(d.plain, q, idx),
+        score: 0
+      });
+    }
+  });
+
+  results.sort((a, b) => b.score - a.score);
+
+  // dedup: max 3 heading results per doc
+  const seen = {};
+  const filtered = results.filter(r => {
+    const k = r.docKey + (r.headingId ? '_h' : '_t');
+    seen[k] = (seen[k] || 0) + 1;
+    return seen[k] <= 3;
+  }).slice(0, 14);
+
+  if (filtered.length === 0) {
+    const notCached = Object.keys(DOC_REGISTRY).length - cachedKeys.length;
+    dd.innerHTML = `<div class="search-empty">没有找到「${q}」相关内容${notCached > 0 ? `<br><span style="font-size:11px">还有 ${notCached} 个文档正在后台加载，稍后再试</span>` : ''}</div>`;
+    dd.classList.add('show');
+    return;
+  }
+
+  dd.innerHTML = filtered.map((r, i) => `
+    <div class="sri" data-i="${i}" onclick="goResult('${r.docKey}','${r.headingId || ''}')">
+      <div><span class="sri-tag">${r.docTitle}</span></div>
+      <div class="sri-title">${hl(r.title, q)}</div>
+      <div class="sri-snippet">${r.snippet}</div>
+    </div>`).join('');
+  dd.classList.add('show');
+  selIdx = -1;
+}
+
+function goResult(docKey, anchorId) {
+  clearSearch();
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('show');
+  switchDoc(docKey, anchorId || null);
+}
+
+function extractSnippet(plain, q, forceIdx) {
+  const idx = forceIdx !== undefined ? forceIdx : plain.toLowerCase().indexOf(q.toLowerCase());
+  if (idx === -1) return hl(plain.slice(0, 80) + '…', q);
+  const s = Math.max(0, idx - 30);
+  const e = Math.min(plain.length, idx + q.length + 60);
+  return (s > 0 ? '…' : '') + hl(plain.slice(s, e), q) + (e < plain.length ? '…' : '');
+}
+
+function hl(text, q) {
+  if (!q) return text;
+  try {
+    return text.replace(
+      new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'),
+      '<mark>$1</mark>'
+    );
+  } catch(e) { return text; }
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-wrap')) closeSearch();
+});
+</script>
 </body>
 </html>
